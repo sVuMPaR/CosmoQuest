@@ -3,34 +3,48 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 
-@WebServlet("/game")
+@WebServlet({"/game", "/reset"})
 public class GameServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        if ("/reset".equals(req.getServletPath())) {
+            handleReset(req, resp);
+            return;
+        }
+        String ctx = req.getContextPath() != null ? req.getContextPath() : "";
+        resp.sendRedirect(ctx + "/");
+    }
+    
+    // Сброс игры: инвалидация сессии и редирект на первый квест.
+    void handleReset(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        String ctx = req.getContextPath() != null ? req.getContextPath() : "";
+        resp.sendRedirect(ctx + "/Quests/quest0.jsp");
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        String path = req.getServletPath();
+        if ("/reset".equals(path)) {
+            handleReset(req, resp);
+            return;
+        }
 
-        // Получаем сессию (создаётся автоматически, если отсутствует)
         HttpSession session = req.getSession();
 
-        // Получаем ответ пользователя
         String answer = req.getParameter("answer");
-
-        // Безопасное получение и инициализация счётчика побед
         Integer victories = (Integer) session.getAttribute("victories");
-        if (victories == null) {
-            victories = 0;
-            session.setAttribute("victories", victories);
-            System.out.println("Инициализирован victories=0");
-        }
+        if (victories == null) victories = 0;
 
-        // Безопасное получение и инициализация текущего квеста
         Integer currentQuest = (Integer) session.getAttribute("currentQuest");
-        if (currentQuest == null) {
-            currentQuest = 0;
-            session.setAttribute("currentQuest", currentQuest);
-            System.out.println("Инициализирован currentQuest=0");
-        }
+        if (currentQuest == null) currentQuest = 0;
+
 
         // Проверка: выбран ли ответ?
         if (answer == null || answer.isEmpty()) {
@@ -56,15 +70,15 @@ public class GameServlet extends HttpServlet {
             // Отмечаем квест как завершённый
             session.setAttribute("quest" + currentQuest, "completed");
 
-            // Переходим к следующему квесту
+            // ТОЛЬКО ЗДЕСЬ увеличиваем номер квеста (после успешной победы)
             currentQuest++;
             session.setAttribute("currentQuest", currentQuest);
 
-            // Переход: если currentQuest ≤ 2 → следующий квест, иначе → final
-            if (currentQuest <= 2) {
-                resp.sendRedirect(req.getContextPath() + "/Quests/quest" + currentQuest + ".jsp");
-            } else {
+            // Переход на следующий квест или финал
+            if (currentQuest > 2) {
                 resp.sendRedirect(req.getContextPath() + "/Quests/final.jsp");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/Quests/quest" + currentQuest + ".jsp");
             }
         } else {
             // Поражение
