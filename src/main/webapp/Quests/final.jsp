@@ -4,21 +4,22 @@
     <title>Это финал боец</title>
 </head>
 <body>
-<h1>Это финал боец боец</h1>
+<h1>Это финал, боец!</h1>
 <p>Ты отлично справился, боец!</p>
 
 <%
     Integer victories = (Integer) session.getAttribute("victories");
+    if (victories == null) victories = 0;
 %>
-<h2>Квест №3</h2>
+<h2>Финал</h2>
 <p>Побед: <%= victories %></p>
-<p>Твоя отвага и упорство, навсегда останется в памяти космодесанта, а теперь в</p>
+<p>Твоя отвага и упорство навсегда останутся в памяти космодесанта. А теперь — в казарму!</p>
 
 <% if (request.getAttribute("message") != null) { %>
 <p style="color: red;"><%= request.getAttribute("message") %></p>
 <% } %>
 
-<button onclick="location.href='/result.jsp'">в казарму!</button>
-<a href="/reset">Начать заново</a>
+<button onclick="location.href='${pageContext.request.contextPath}/result.jsp'">В казарму!</button>
+<a href="${pageContext.request.contextPath}/reset">Начать заново</a>
 </body>
 </html>

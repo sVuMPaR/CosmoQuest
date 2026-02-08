@@ -20,11 +20,11 @@
 <p style="color: red;"><%= request.getAttribute("message") %></p>
 <% } %>
 
-<form action="/game" method="post">
-    <input type="radio" name="answer" value="accept">Посшибать всем бошки!<br>
+<form action="${pageContext.request.contextPath}/game" method="post">
+    <input type="radio" name="answer" value="accept">Пошибать всем бошки!<br>
     <input type="radio" name="answer" value="decline">Отступить?<br>
     <input type="submit" value="Ответить">
 </form>
-<a href="/reset">Начать заново</a>
+<a href="${pageContext.request.contextPath}/reset">Начать заново</a>
 </body>
 </html>

@@ -9,6 +9,7 @@
 
 <%
     Integer victories = (Integer) session.getAttribute("victories");
+    if (victories == null) victories = 0;
 %>
 <h2>Квест №2</h2>
 <p>Побед: <%= victories %></p>
@@ -18,11 +19,11 @@
 <p style="color: red;"><%= request.getAttribute("message") %></p>
 <% } %>
 
-<form action="/game" method="post">
+<form action="${pageContext.request.contextPath}/game" method="post">
     <input type="radio" name="answer" value="accept">Ринуться в гору для занятия позиции<br>
     <input type="radio" name="answer" value="decline">Отступить?<br>
     <input type="submit" value="Ответить">
 </form>
-<a href="/reset">Начать заново</a>
+<a href="${pageContext.request.contextPath}/reset">Начать заново</a>
 </body>
 </html>
